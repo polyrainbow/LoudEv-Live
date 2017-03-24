@@ -123,7 +123,6 @@ var ebu_s_analyzer = AC.createAnalyser();
 ebu_s_analyzer.fftSize = 2048;
 
 //CONNECTING EBU GRAPH
-source.connect(ebu_splitter);
 ebu_splitter.connect(highshelf_filter_L, 0, 0);
 ebu_splitter.connect(highshelf_filter_R, 1, 0);
 
@@ -158,7 +157,6 @@ function absoluteValueToDBFS(value){
 }
 
 var rmsSplitter = AC.createChannelSplitter(2);
-source.connect(rmsSplitter);
 
 //SQUARING THE SIGNAL
 var squareGainRMS_L = AC.createGain();
@@ -243,6 +241,8 @@ gainAfterConvolverRMS_R.connect(squareRootNodeRMS_R);
 squareRootNodeRMS_L.connect(analyserRMS_L);
 squareRootNodeRMS_R.connect(analyserRMS_R);
 
+source.connect(ebu_splitter);
+source.connect(rmsSplitter);
 source.connect(analyserPeak);
 source.connect(AC.destination);
 
