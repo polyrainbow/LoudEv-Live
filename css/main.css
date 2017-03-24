@@ -20,3 +20,7 @@ audio{
 #file_input{
 	margin-right: 20px;
 }
+
+#emoji_display{
+	font-size: 24pt;
+}

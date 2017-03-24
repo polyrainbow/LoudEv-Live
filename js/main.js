@@ -47,6 +47,33 @@ var getColorOfPSRValue = function(psr_value){
 
 }
 
+var getEmojiOfPSRValue = function(psr_value){
+	var emoji;
+
+	if (psr_value < 5){
+		emoji = '😵';
+	} else if (psr_value < 6){
+		emoji = '😭';
+	} else if (psr_value < 7){
+		emoji = '😢';
+	} else if (psr_value < 7.5){
+		emoji = '☹️';
+	} else if (psr_value < 8){
+		emoji = '🙁';
+	} else if (psr_value < 8.5){
+		emoji = '😕';
+	} else if (psr_value < 9.5){
+		emoji = '😐';
+	} else if (psr_value < 11){
+		emoji = '😊';
+	} else {
+		emoji = '😃';
+	}
+
+	return emoji;
+
+}
+
 var ebu_splitter = AC.createChannelSplitter(2);
 
 //first stage shelving filter
@@ -284,6 +311,8 @@ function draw() {
 	else {
 		psr_display.innerHTML = "No signal";
 	}
+
+	emoji_display.innerHTML = getEmojiOfPSRValue(psr_lu);
 
 	psrArray.splice(0, 1);
 	psrArray.push(psr_lu);
