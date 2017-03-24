@@ -1,0 +1,52 @@
+<script>
+var AC = new AudioContext()
+console.log("AC.sampleRate = " + AC.sampleRate);
+
+var a0 = 1;
+var a1 = -1.69065929318241;
+var a2 = 0.73248077421585;
+
+var b0 = 1.53512485958697;
+var b1 = -2.69169618940638;
+var b2 = 1.19839281085285;
+
+var fb = new Float64Array(3);
+fb[0] = a0;
+fb[1] = a1;
+fb[2] = a2;
+
+var ff = new Float64Array(3);
+ff[0] = b0;
+ff[1] = b1;
+ff[2] = b2;
+
+var iir = AC.createIIRFilter(ff, fb);
+
+var magnitude_output = new Float32Array(6);
+var phase_output = new Float32Array(6);
+var f_in = [100, 500, 1000, 1500, 2000, 4000];
+iir.getFrequencyResponse(new Float32Array(f_in), magnitude_output, phase_output);
+var output_db = magnitude_output.map(x => 20 * Math.log10(x));
+
+for (var i = 0; i<6; i++)
+console.log("IIR Frequency response at " + f_in[i] + " Hz: " + output_db[i] + " dB");
+
+//now, let's try a biquad filter instead
+var bq = AC.createBiquadFilter();
+bq.type = "highshelf";
+bq.frequency.value = 1500;
+bq.Q.value = 1;
+bq.gain.value = 4;
+
+var magnitude_output = new Float32Array(6);
+var phase_output = new Float32Array(6);
+var f_in = [100, 500, 1000, 1500, 2000, 4000];
+bq.getFrequencyResponse(new Float32Array(f_in), magnitude_output, phase_output);
+var output_db = magnitude_output.map(x => 20 * Math.log10(x));
+
+for (var i = 0; i<6; i++)
+console.log("Biquad Frequency response at " + f_in[i] + " Hz: " + output_db[i] + " dB");
+
+
+
+</script>
