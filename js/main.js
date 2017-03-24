@@ -19,6 +19,34 @@ var rmsArray_L = new Array(canvas_waveform_width);
 var rmsArray_R = new Array(canvas_waveform_width);
 var psrArray = new Array(canvas_waveform_width);
 
+
+var getColorOfPSRValue = function(psr_value){
+	var color;
+
+	if (psr_value < 4.75){
+		color = '#000000';  //black
+	} else if (psr_value < 5.75){
+		color = '#770000';  //dark red
+	} else if (psr_value < 6.75){
+		color = '#ff0000';  //red
+	} else if (psr_value < 7.25){
+		color = '#ff4500';  //orangered
+	} else if (psr_value < 7.75){
+		color = '#ffa500';  //orange
+	} else if (psr_value < 8.5){
+		color = '#ffc500';  //brighter orange
+	} else if (psr_value < 9.75){
+		color = '#ffff00';  //yellow
+	} else if (psr_value < 11){
+		color = '#b4ff00';  //yellow green
+	} else {
+		color = '#00ff00';  //lime green
+	}
+
+	return color;
+
+}
+
 var ebu_splitter = AC.createChannelSplitter(2);
 
 //first stage shelving filter
@@ -302,44 +330,9 @@ function draw() {
 	for (var x = 0; x < psrArray.length; x++) {
 
 		canvasCtx_loudness.beginPath();
-
-		if (psrArray[x] < 4.75){
-			canvasCtx_loudness.strokeStyle = '#000000';  //black
-		}
-
-		else if (psrArray[x] < 5.75){
-			canvasCtx_loudness.strokeStyle = '#770000';  //dark red
-		}
-
-		else if (psrArray[x] < 6.75){
-			canvasCtx_loudness.strokeStyle = '#ff0000';  //red
-		}
-
-		else if (psrArray[x] < 7.25){
-			canvasCtx_loudness.strokeStyle = '#ff4500';  //orangered
-		}
-
-		else if (psrArray[x] < 7.75){
-			canvasCtx_loudness.strokeStyle = '#ffa500';  //orange
-		}
-
-		else if (psrArray[x] < 8.5){
-			canvasCtx_loudness.strokeStyle = '#ffc500';  //brighter orange
-		}
-
-		else if (psrArray[x] < 9.75){
-			canvasCtx_loudness.strokeStyle = '#ffff00';  //yellow
-		}
-
-		else if (psrArray[x] < 11){
-			canvasCtx_loudness.strokeStyle = '#b4ff00';  //yellow green
-		}
-
-		else {
-			canvasCtx_loudness.strokeStyle = '#00ff00';  //lime green
-		}
-
-		var y = canvas_waveform_height - ((psrArray[x] / 17) * canvas_waveform_height);
+		var psr_value = psrArray[x];
+		canvasCtx_loudness.strokeStyle = getColorOfPSRValue(psr_value);
+		var y = canvas_waveform_height - ((psr_value / 17) * canvas_waveform_height);
 		//console.log(lineHeight);
 		canvasCtx_loudness.moveTo(x, canvas_waveform_height);
 		canvasCtx_loudness.lineTo(x, y);

@@ -16,3 +16,7 @@ audio{
 	display:block;
 	width: 1000px;
 }
+
+#file_input{
+	margin-right: 20px;
+}
