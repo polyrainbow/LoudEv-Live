@@ -18,61 +18,7 @@ var peakArray = new Array(canvas_waveform_width);
 var rmsArray_L = new Array(canvas_waveform_width);
 var rmsArray_R = new Array(canvas_waveform_width);
 var psrArray = new Array(canvas_waveform_width);
-
-
-var getColorOfPSRValue = function(psr_value){
-	var color;
-
-	if (psr_value < 5){
-		color = '#000000';  //black
-	} else if (psr_value < 6){
-		color = '#770000';  //dark red
-	} else if (psr_value < 7){
-		color = '#ff0000';  //red
-	} else if (psr_value < 7.5){
-		color = '#ff4500';  //orangered
-	} else if (psr_value < 8){
-		color = '#ffa500';  //orange
-	} else if (psr_value < 8.5){
-		color = '#ffc500';  //brighter orange
-	} else if (psr_value < 9.5){
-		color = '#ffff00';  //yellow
-	} else if (psr_value < 11){
-		color = '#b4ff00';  //yellow green
-	} else {
-		color = '#00ff00';  //lime green
-	}
-
-	return color;
-
-}
-
-var getEmojiOfPSRValue = function(psr_value){
-	var emoji;
-
-	if (psr_value < 5){
-		emoji = '😵';
-	} else if (psr_value < 6){
-		emoji = '😭';
-	} else if (psr_value < 7){
-		emoji = '😢';
-	} else if (psr_value < 7.5){
-		emoji = '☹️';
-	} else if (psr_value < 8){
-		emoji = '🙁';
-	} else if (psr_value < 8.5){
-		emoji = '😕';
-	} else if (psr_value < 9.5){
-		emoji = '😐';
-	} else if (psr_value < 11){
-		emoji = '😊';
-	} else {
-		emoji = '😃';
-	}
-
-	return emoji;
-
-}
+var peakBuffer3Seconds = Array(180);
 
 var ebu_splitter = AC.createChannelSplitter(2);
 
@@ -181,23 +127,18 @@ var rms_convolver_L = AC.createConvolver();
 rms_convolver_L.normalize = false;
 var rms_convolver_R = AC.createConvolver();
 rms_convolver_R.normalize = false;
-// grab audio track via XHR for convolver node
-var ajaxRequest = new XMLHttpRequest();
-ajaxRequest.open('GET', "impulse responses/3sec-1-mono_44100.wav", true);
-ajaxRequest.responseType = 'arraybuffer';
 
-ajaxRequest.onload = function() {
-	var audioData = ajaxRequest.response;
-	AC.decodeAudioData(audioData, function(audioBuffer) {
-		rms_convolver_L.buffer = audioBuffer;
-		rms_convolver_R.buffer = audioBuffer;
-		ebu_convolver_L.buffer = audioBuffer;
-		ebu_convolver_R.buffer = audioBuffer;
-		console.log("Convolver buffer set!");
-	}, function(e){"Error with decoding audio data" + e.err});
-}
-
-ajaxRequest.send();
+// grab audio track for convolver node
+fetch("impulse responses/3sec-1-mono_44100.wav")
+.then(r => r.arrayBuffer())
+.then(b => AC.decodeAudioData(b))
+.then(audioBuffer => {
+	rms_convolver_L.buffer = audioBuffer;
+	rms_convolver_R.buffer = audioBuffer;
+	ebu_convolver_L.buffer = audioBuffer;
+	ebu_convolver_R.buffer = audioBuffer;
+	console.log("Convolver buffer set!");
+});
 
 squareGainRMS_L.connect(rms_convolver_L);
 squareGainRMS_R.connect(rms_convolver_R);
@@ -255,23 +196,6 @@ var dataArrayRMS_L = new Float32Array(bufferLength);
 var dataArrayRMS_R = new Float32Array(bufferLength);
 var dataArrayEBU_S = new Float32Array(bufferLength);
 
-Float32Array.prototype.max = function(){
-	var max = -Infinity;
-	var len = this.length;
-	for (var i=0 ; i < len; i++ )
-	if ( this[i] > max ) max = this[i];
-	return max;
-};
-
-Array.prototype.max = function(){
-	var max = -Infinity;
-	var len = this.length;
-	for (var i=0 ; i < len; i++ )
-	if ( this[i] > max ) max = this[i];
-	return max;
-};
-
-var peakBuffer3Seconds = Array(180);
 
 function draw() {
 	analyserPeak.getFloatTimeDomainData(dataArrayPeak);
@@ -284,7 +208,7 @@ function draw() {
 
 	//PEAK Calculation
 	peakArray.splice(0, 1);
-	var max = dataArrayPeak.max();
+	var max = dataArrayPeak.maxAbs();
 	peakArray.push(max);
 
 	//PEAK buffer
@@ -312,7 +236,7 @@ function draw() {
 		psr_display.innerHTML = "No signal";
 	}
 
-	emoji_display.innerHTML = getEmojiOfPSRValue(psr_lu);
+	emoji_display.innerHTML = ASSESS.getPSREmoji(psr_lu);
 
 	psrArray.splice(0, 1);
 	psrArray.push(psr_lu);
@@ -360,7 +284,7 @@ function draw() {
 
 		canvasCtx_loudness.beginPath();
 		var psr_value = psrArray[x];
-		canvasCtx_loudness.strokeStyle = getColorOfPSRValue(psr_value);
+		canvasCtx_loudness.strokeStyle = ASSESS.getPSRColor(psr_value);
 		var y = canvas_waveform_height - ((psr_value / 17) * canvas_waveform_height);
 		//console.log(lineHeight);
 		canvasCtx_loudness.moveTo(x, canvas_waveform_height);

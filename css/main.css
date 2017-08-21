@@ -7,10 +7,19 @@
 	font-weight: bold;
 }
 
-.footer_logo{
-	height: 120px;
-	padding-top: 15px;
+#footer{
+	text-align: center;
 }
+
+#footer a{
+	text-decoration: none;
+}
+
+.footer_logo{
+	height: 80px;
+	padding: 15px;
+}
+
 
 audio{
 	display:block;
