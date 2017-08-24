@@ -773,3 +773,8 @@ Array.prototype.maxAbs = function(){
 	if (Math.abs(this[i]) > maxAbs ) maxAbs = Math.abs(this[i]);
 	return maxAbs;
 };
+
+
+var roundTo1Decimal = function(val){
+	return (Math.round( val * 10 ) / 10).toFixed(1);
+}
