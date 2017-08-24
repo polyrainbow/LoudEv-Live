@@ -172,10 +172,10 @@ class R128 {
 		peakSplitter.connect(this.analyserPeak_L, 0, 0);
 		peakSplitter.connect(this.analyserPeak_R, 1, 0);
 
-		this.analyserPeak_L.fftSize = 8192;  //higher?
+		this.analyserPeak_L.fftSize = 32768;
 		this.analyserPeak_L.smoothingTimeConstant = 0;
 
-		this.analyserPeak_R.fftSize = 8192;  //higher?
+		this.analyserPeak_R.fftSize = 32768;
 		this.analyserPeak_R.smoothingTimeConstant = 0;
 
 		this.analyserRMS_L.fftSize = 2048;
