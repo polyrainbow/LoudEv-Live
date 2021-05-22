@@ -1,6 +1,13 @@
 var AC = new AudioContext();
+
+const resumeAC = () => {
+	AC.resume();
+}
+
 var audio_source_element = document.getElementById("audio_source");
 var source = AC.createMediaElementSource(audio_source_element);
+var inputNodeForR128 = AC.createGain();
+source.connect(inputNodeForR128);
 
 var analyserWaveForm = AC.createAnalyser();
 
@@ -19,7 +26,7 @@ var rmsHistory_L = new Array(canvas_waveform_width);
 var rmsHistory_R = new Array(canvas_waveform_width);
 var psrHistory = new Array(canvas_waveform_width);
 
-var r128 = new R128(source);
+var r128 = new R128(inputNodeForR128);
 
 for(var i=0; i<canvas_waveform_width; i++){
 	peakHistory[i] = 0;
@@ -131,6 +138,7 @@ draw();
 
 var file_input = document.getElementById("file_input");
 file_input.addEventListener("change", function(e){
+	resumeAC();
 
 	var file = e.target.files[0];
 	var fileURL = URL.createObjectURL(file);
@@ -139,15 +147,15 @@ file_input.addEventListener("change", function(e){
 })
 
 document.getElementById("button_live_input").addEventListener("click", function(){
+	resumeAC();
 
 	if (navigator.mediaDevices) {
 	    console.log('getUserMedia supported.');
 	    navigator.mediaDevices.getUserMedia ({audio: true})
 	    .then(function(stream) {
 	        var liveSource = AC.createMediaStreamSource(stream);
-	        liveSource.connect(rmsSplitter);
-			liveSource.connect(ebu_splitter);
 			liveSource.connect(analyserWaveForm);
+			liveSource.connect(inputNodeForR128);
 	    })
 	    .catch(function(err) {
 	        console.log('The following gUM error occured: ' + err);
